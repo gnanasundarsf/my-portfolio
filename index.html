@@ -1,0 +1,287 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gnana Sundar Natarajan - Portfolio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gnana Sundar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#certifications">Certifications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="py-5 bg-primary text-white text-center">
+        <div class="container">
+            <h1>Gnana Sundar Natarajan</h1>
+            <h3>Salesforce Developer | Certified PDII & AI Specialist</h3>
+            <p class="lead">Salesforce-certified developer with 8+ years of experience designing and implementing scalable Salesforce solutions for public sector, healthcare, and education clients. Passionate about leveraging AI features within Salesforce.</p>
+            <a href="resume.pdf" class="btn btn-light mt-3" download>Download Resume</a>
+        </div>
+    </section>
+
+    <section id="experience" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4"><i class="bi bi-briefcase"></i> Experience</h2>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Salesforce Developer - Episource</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Jan 2021 – Present | Chennai / Remote</h6>
+                            <ul>
+                                <li>Developed custom LWC components and reusable UI libraries, reducing development time by 40%.</li>
+                                <li>Built Apex batch jobs to process high-volume OCR and contact records with polling and status tracking.</li>
+                                <li>Implemented CI/CD pipelines using GitLab and SFDX, improving deployment success rate by 90%.</li>
+                                <li>Designed integration with external systems using named credentials and JWT flow.</li>
+                                <li>Collaborated across teams to enable manual OCR feature, increasing release readiness.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Salesforce Developer - California Secretary of State (via Mastek)</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">May 2019 – Dec 2020</h6>
+                            <ul>
+                                <li>Delivered secure public web portal using Experience Cloud for SoS application.</li>
+                                <li>Created asynchronous Apex processes to sync records and provide timely updates.</li>
+                                <li>Configured dynamic OmniScripts for form submissions and approval processes.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Salesforce Admin & Developer - Alliant International University (via Mastek)</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Jul 2018 – Apr 2019</h6>
+                            <ul>
+                                <li>Migrated legacy records into Salesforce using Data Loader and Apex.</li>
+                                <li>Automated user provisioning and email alerts using Flows and Process Builder.</li>
+                                <li>Trained team on release management using GitLab and SFDX.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Salesforce Developer - Arizona State Land Department (via Mastek)</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Jan 2017 – Jun 2018</h6>
+                            <ul>
+                                <li>Developed Salesforce REST services for land parcel submissions and file uploads.</li>
+                                <li>Reduced manual errors by 70% by integrating with the state’s land registry system.</li>
+                                <li>Enhanced UI/UX using Lightning components and standardised forms.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4"><i class="bi bi-folder"></i> Projects</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">OCR Batch Job System (2023)</h5>
+                            <p class="card-text">Designed full-stack LWC and Apex solution to handle CSV uploads, polling, error validation, and export functionality.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">AI Prompt Builder PoC</h5>
+                            <p class="card-text">Built prototype using invocable methods to trigger Einstein and GPT-powered outputs.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Salesforce AI Enablement</h5>
+                            <p class="card-text">Explored Salesforce AI features in trial orgs; working towards full integration with Data Cloud.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4"><i class="bi bi-tools"></i> Skills</h2>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <h3>Salesforce</h3>
+                    <div>
+                        <span class="badge bg-primary m-1">Apex</span>
+                        <span class="badge bg-primary m-1">Triggers</span>
+                        <span class="badge bg-primary m-1">Batch Apex</span>
+                        <span class="badge bg-primary m-1">LWC</span>
+                        <span class="badge bg-primary m-1">Aura</span>
+                        <span class="badge bg-primary m-1">Flows</span>
+                        <span class="badge bg-primary m-1">OmniStudio</span>
+                        <span class="badge bg-primary m-1">Platform Events</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h3>Integrations</h3>
+                    <div>
+                        <span class="badge bg-success m-1">REST API</span>
+                        <span class="badge bg-success m-1">SOAP API</span>
+                        <span class="badge bg-success m-1">Named Credentials</span>
+                        <span class="badge bg-success m-1">JWT Auth</span>
+                        <span class="badge bg-success m-1">External Services</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h3>Development Tools</h3>
+                    <div>
+                        <span class="badge bg-info m-1">SFDX</span>
+                        <span class="badge bg-info m-1">Visual Studio Code</span>
+                        <span class="badge bg-info m-1">GitLab CI/CD</span>
+                        <span class="badge bg-info m-1">Jenkins</span>
+                        <span class="badge bg-info m-1">Postman</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h3>Cloud/DevOps</h3>
+                    <div>
+                        <span class="badge bg-warning m-1">Salesforce DX</span>
+                        <span class="badge bg-warning m-1">GitHub</span>
+                        <span class="badge bg-warning m-1">Workbench</span>
+                        <span class="badge bg-warning m-1">Data Loader</span>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h3>Methodologies</h3>
+                    <div>
+                        <span class="badge bg-secondary m-1">Agile</span>
+                        <span class="badge bg-secondary m-1">Scrum</span>
+                        <span class="badge bg-secondary m-1">Jira</span>
+                        <span class="badge bg-secondary m-1">Confluence</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="certifications" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4"><i class="bi bi-award"></i> Certifications</h2>
+            <ul class="list-unstyled text-center">
+                <li>Salesforce Platform Developer II</li>
+                <li>Salesforce AI Associate</li>
+                <li>Salesforce AI Specialist</li>
+                <li>Salesforce OmniStudio Developer</li>
+                <li>Salesforce JavaScript Developer I</li>
+                <li>Salesforce Experience Cloud Consultant</li>
+                <li>Salesforce Administrator</li>
+                <li>Salesforce Platform App Builder</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="education" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4"><i class="bi bi-book"></i> Education</h2>
+            <ul class="list-unstyled text-center">
+                <li><strong>Master of Computer Applications (M.C.A.)</strong>, Srimad Andavan College – 2014</li>
+                <li><strong>Bachelor of Science in Computer Science (B.Sc.)</strong>, Sathyabama University – 2012</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="awards" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4"><i class="bi bi-trophy"></i> Awards & Recognition</h2>
+            <ul class="list-unstyled text-center">
+                <li><strong>Dream Team Award</strong> – California Secretary of State (SoS CARS Project) for early delivery and quality</li>
+                <li><strong>Spotlight Award</strong> – Alliant University project for leading system migration and improving performance</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="contact" class="py-5">
+        <div class="container text-center">
+            <h2 class="mb-4"><i class="bi bi-person-lines-fill"></i> Contact</h2>
+            <p><i class="bi bi-envelope"></i> Email: <a href="mailto:gnana.natarajan@mastek.com">gnana.natarajan@mastek.com</a></p>
+            <p><i class="bi bi-phone"></i> Phone: +91 978-898-4204</p>
+            <p><i class="bi bi-linkedin"></i> LinkedIn: <a href="https://linkedin.com/in/gnanasundar" target="_blank">linkedin.com/in/gnanasundar</a></p>
+        </div>
+    </section>
+
+    <footer class="py-3 bg-dark text-white text-center">
+        <div class="container">
+            <p>&copy; 2025 Gnana Sundar Natarajan. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
