@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -46,10 +7,22 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        h2 {
+            color: #FFC107;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Gnana Sundar</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +32,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Key Projects</a></li>
                     <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
                     <li class="nav-item"><a class="nav-link" href="#certifications">Certifications</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
@@ -68,108 +41,100 @@
         </div>
     </nav>
 
-    <section id="home" class="py-5 bg-primary text-white text-center">
+    <section id="home" class="py-5 bg-warning text-dark text-center">
         <div class="container">
             <h1>Gnana Sundar Natarajan</h1>
             <h3>Salesforce Developer | Certified PDII & AI Specialist</h3>
-            <p class="lead">Salesforce-certified developer with 8+ years of experience designing and implementing scalable Salesforce solutions for public sector, healthcare, and education clients. Passionate about leveraging AI features within Salesforce.</p>
-            <a href="resume.pdf" class="btn btn-light mt-3" download>Download Resume</a>
+            <p class="lead">Experienced Salesforce developer delivering innovative solutions. Download my resume for more details.</p>
+            <a href="resume.pdf" class="btn btn-dark mt-3" download>Download Resume</a>
         </div>
     </section>
 
     <section id="experience" class="py-5">
         <div class="container">
             <h2 class="text-center mb-4"><i class="bi bi-briefcase"></i> Experience</h2>
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Salesforce Developer - Episource</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Jan 2021 – Present | Chennai / Remote</h6>
-                            <ul>
-                                <li>Developed custom LWC components and reusable UI libraries, reducing development time by 40%.</li>
-                                <li>Built Apex batch jobs to process high-volume OCR and contact records with polling and status tracking.</li>
-                                <li>Implemented CI/CD pipelines using GitLab and SFDX, improving deployment success rate by 90%.</li>
-                                <li>Designed integration with external systems using named credentials and JWT flow.</li>
-                                <li>Collaborated across teams to enable manual OCR feature, increasing release readiness.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Salesforce Developer - California Secretary of State (via Mastek)</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">May 2019 – Dec 2020</h6>
-                            <ul>
-                                <li>Delivered secure public web portal using Experience Cloud for SoS application.</li>
-                                <li>Created asynchronous Apex processes to sync records and provide timely updates.</li>
-                                <li>Configured dynamic OmniScripts for form submissions and approval processes.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Salesforce Admin & Developer - Alliant International University (via Mastek)</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Jul 2018 – Apr 2019</h6>
-                            <ul>
-                                <li>Migrated legacy records into Salesforce using Data Loader and Apex.</li>
-                                <li>Automated user provisioning and email alerts using Flows and Process Builder.</li>
-                                <li>Trained team on release management using GitLab and SFDX.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Salesforce Developer - Arizona State Land Department (via Mastek)</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Jan 2017 – Jun 2018</h6>
-                            <ul>
-                                <li>Developed Salesforce REST services for land parcel submissions and file uploads.</li>
-                                <li>Reduced manual errors by 70% by integrating with the state’s land registry system.</li>
-                                <li>Enhanced UI/UX using Lightning components and standardised forms.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ul class="list-unstyled text-center">
+                <li>Salesforce Developer at Mastek (2021 - Present)</li>
+                <li>Salesforce Developer at MST Solutions (2016 - 2021)</li>
+            </ul>
         </div>
     </section>
 
     <section id="projects" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4"><i class="bi bi-folder"></i> Projects</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">OCR Batch Job System (2023)</h5>
-                            <p class="card-text">Designed full-stack LWC and Apex solution to handle CSV uploads, polling, error validation, and export functionality.</p>
-                        </div>
+    <div class="container">
+        <h2 class="text-center mb-4"><i class="bi bi-folder"></i> Key Projects</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Arizona State Land Department (2017 – 2018)</h5>
+                        <p><strong>Client:</strong> Arizona State Land Department</p>
+                        <p><strong>Methodology:</strong> Agile</p>
+                        <p><strong>Responsibilities:</strong></p>
+                        <ul>
+                            <li>Designed and implemented Workflow Rules, Process Builders, Validation Rules, and Approval Processes.</li>
+                            <li>Developed FormAssembly forms integrated with Salesforce.</li>
+                            <li>Managed Salesforce integration with ViewCenter for file storage.</li>
+                            <li>Led deployment activities during UAT and Go-Live phases.</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">AI Prompt Builder PoC</h5>
-                            <p class="card-text">Built prototype using invocable methods to trigger Einstein and GPT-powered outputs.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Salesforce AI Enablement</h5>
-                            <p class="card-text">Explored Salesforce AI features in trial orgs; working towards full integration with Data Cloud.</p>
-                        </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Alliant International University (2017 – 2019)</h5>
+                        <p><strong>Client:</strong> Alliant International University</p>
+                        <p><strong>Methodology:</strong> Agile</p>
+                        <p><strong>Responsibilities:</strong></p>
+                        <ul>
+                            <li>Created Salesforce Knowledge objects for article management.</li>
+                            <li>Built process automation for article review and publishing.</li>
+                            <li>Migrated articles from Classic to Lightning using the Lightning Knowledge Migration Tool.</li>
+                            <li>Designed Visualforce pages for collecting internal user feedback.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">California Secretary of State (2019 – 2021)</h5>
+                        <p><strong>Client:</strong> California Secretary of State</p>
+                        <p><strong>Methodology:</strong> Agile</p>
+                        <p><strong>Responsibilities:</strong></p>
+                        <ul>
+                            <li>Designed integrations between Salesforce and other enterprise systems.</li>
+                            <li>Implemented Trigger Frameworks, SOQL, SOSL, REST, and SOAP APIs.</li>
+                            <li>Developed asynchronous Apex using @Future, Queueable, Batch, and Scheduled Apex.</li>
+                            <li>Built Lightning components for Experience Cloud.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Episource (2021 – 2025)</h5>
+                        <p><strong>Client:</strong> Episource</p>
+                        <p><strong>Methodology:</strong> Agile</p>
+                        <p><strong>Responsibilities:</strong></p>
+                        <ul>
+                            <li>Collaborated with stakeholders and product directors to gather requirements.</li>
+                            <li>Developed reusable LWC components in the Lightning platform.</li>
+                            <li>Created and maintained managed packages containing LWC and Aura components.</li>
+                            <li>Implemented trigger frameworks and SOQL standards.</li>
+                            <li>Developed a generic Salesforce Logger for error handling in Apex.</li>
+                            <li>Worked with Business System Analysts (BSA) and Business Analysts (BA) to break down functional requirements in Jira.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
     <section id="skills" class="py-5">
         <div class="container">
@@ -269,19 +234,18 @@
     <section id="contact" class="py-5">
         <div class="container text-center">
             <h2 class="mb-4"><i class="bi bi-person-lines-fill"></i> Contact</h2>
-            <p><i class="bi bi-envelope"></i> Email: <a href="mailto:gnana.natarajan@mastek.com">gnana.natarajan@mastek.com</a></p>
+            <p><i class="bi bi-envelope"></i> Email: <a href="mailto:gnanasundar025@gmail.com">gnanasundar025@gmail.com</a></p>
             <p><i class="bi bi-phone"></i> Phone: +91 978-898-4204</p>
-            <p><i class="bi bi-linkedin"></i> LinkedIn: <a href="https://linkedin.com/in/gnanasundar" target="_blank">linkedin.com/in/gnanasundar</a></p>
+            <p><i class="bi bi-linkedin"></i> LinkedIn: <a href="https://www.linkedin.com/in/gnana-sundar-9bb7a113b" target="_blank">www.linkedin.com/in/gnana-sundar-9bb7a113b</a></p>
         </div>
     </section>
 
     <footer class="py-3 bg-dark text-white text-center">
         <div class="container">
-            <p>&copy; 2025 Gnana Sundar Natarajan. All rights reserved.</p>
+            <p>© 2025 Gnana Sundar Natarajan. All rights reserved.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
 </body>
 </html>
